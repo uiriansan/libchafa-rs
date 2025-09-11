@@ -1,10 +1,21 @@
 #![allow(unused_imports)]
-pub mod canvas;
-pub mod features;
 pub mod ffi;
-pub mod frame;
-pub mod image;
-pub mod misc;
-pub mod placement;
-pub mod symbol_map;
+
+pub mod canvas;
+
+mod features;
+pub use features::*;
+
+mod frame;
+pub use frame::*;
+
+mod image;
+pub use image::*;
+
+mod placement;
+pub use placement::*;
+
+mod symbol_map;
+pub use symbol_map::*;
+
 pub mod term;
