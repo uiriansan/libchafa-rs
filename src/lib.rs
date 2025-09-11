@@ -3,8 +3,8 @@ pub mod ffi;
 
 pub mod canvas;
 
-mod features;
-pub use features::*;
+pub mod features;
+pub use features::Features;
 
 mod frame;
 pub use frame::*;

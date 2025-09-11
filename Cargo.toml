@@ -6,3 +6,6 @@ edition = "2024"
 [build-dependencies]
 bindgen = "0.72.1"
 pkg-config = "0.3.32"
+
+[dependencies]
+bitflags = "2.9.4"

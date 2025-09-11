@@ -95,6 +95,7 @@ name = "libchafa"
 version = "0.1.0"
 dependencies = [
  "bindgen",
+ "bitflags",
  "pkg-config",
 ]
 
