@@ -29,9 +29,8 @@ impl SymbolMap {
 
     /// Adds symbols matching the set of tags to symbol_map.
     pub fn add_by_tags(&self, tags: SymbolTags) {
-        let st = i32_from_symbol_tags(tags);
         unsafe {
-            ffi::chafa_symbol_map_add_by_tags(self.raw, st);
+            ffi::chafa_symbol_map_add_by_tags(self.raw, tags.bits() as i32);
         }
     }
 
@@ -47,9 +46,8 @@ impl SymbolMap {
 
     /// Removes symbols matching the set of tags from symbol_map .
     pub fn remove_by_tags(&self, tags: SymbolTags) {
-        let st = i32_from_symbol_tags(tags);
         unsafe {
-            ffi::chafa_symbol_map_remove_by_tags(self.raw, st);
+            ffi::chafa_symbol_map_remove_by_tags(self.raw, tags.bits() as i32);
         }
     }
 
@@ -227,111 +225,74 @@ pub const SYMBOL_WIDTH_PIXELS: u32 = ffi::CHAFA_SYMBOL_WIDTH_PIXELS;
 /// The height of an internal symbol pixel matrix. If you are prescaling input graphics, you will get the best results when scaling to a multiple of this value.
 pub const SYMBOL_HEIGHT_PIXELS: u32 = ffi::CHAFA_SYMBOL_HEIGHT_PIXELS;
 
-#[repr(i32)]
-pub enum SymbolTags {
-    /// Special value meaning no symbols.
-    None = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_NONE,
-
-    /// Space.
-    Space = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SPACE,
-    /// Solid (inverse of space).
-    Solid = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SOLID,
-    /// Stipple symbols.
-    Stipple = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_STIPPLE,
-    /// Block symbols.
-    Block = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BLOCK,
-    /// Border symbols.
-    Border = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BORDER,
-    /// Diagonal border symbols.
-    Diagonal = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DIAGONAL,
-    /// Symbols that look like isolated dots (excluding Braille).
-    Dot = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DOT,
-    /// Quadrant block symbols.
-    Quad = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_QUAD,
-    /// Horizontal half block symbols.
-    Hhalf = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_HHALF,
-    /// Vertical half block symbols.
-    Vhalf = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_VHALF,
-    /// Joint set of horizontal and vertical halves.
-    Half = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_HALF,
-    /// Symbols that are the inverse of simpler symbols. When two symbols complement each other, only one will have this tag.
-    Inverted = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_INVERTED,
-    /// Braille symbols.
-    Braille = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BRAILLE,
-    /// Miscellaneous technical symbols.
-    Technical = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_TECHNICAL,
-    /// Geometric shapes
-    Geometric = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_GEOMETRIC,
-    /// Printable ASCII characters.
-    ASCII = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ASCII,
-    /// Letters.
-    Alpha = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALPHA,
-    /// Digits.
-    Digit = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DIGIT,
-    /// Joint set of letters and digits.
-    AlNum = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALNUM,
-    /// Characters that are one cell wide.
-    Narrow = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_NARROW,
-    /// Characters that are two cells wide.
-    Wide = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_WIDE,
-    /// Characters of uncertain width. Always excluded unless specifically asked for.
-    Ambiguous = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_AMBIGUOUS,
-    /// Characters that are generally undesired or unlikely to render well. Always excluded unless specifically asked for.
-    Ugly = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_UGLY,
-    /// Legacy computer symbols, including sextants, wedges and more.   
-    Legacy = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_LEGACY,
-    /// Sextant 2x3 mosaics.
-    Sextant = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SEXTANT,
-    /// Wedge shapes that align with sextants.
-    Wedge = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_WEDGE,
-    /// Latin and Latin-like symbols (superset of ASCII).
-    Latin = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_LATIN,
-    /// Symbols for which glyphs were imported with chafa_symbol_map_add_glyph().
-    Imported = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_IMPORTED,
-    /// Octant 2x4 mosaics.
-    Octant = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_OCTANT,
-    /// Symbols not in any other category.
-    Extra = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_EXTRA,
-    /// Joint set of ugly and ambiguous characters. Always excluded unless specifically asked for.
-    Bad = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BAD,
-    /// Special value meaning all supported symbols.
-    All = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALL,
-}
-
-fn i32_from_symbol_tags(tags: SymbolTags) -> i32 {
-    match tags {
-        SymbolTags::None => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_NONE,
-        SymbolTags::Space => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SPACE,
-        SymbolTags::Solid => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SOLID,
-        SymbolTags::Stipple => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_STIPPLE,
-        SymbolTags::Block => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BLOCK,
-        SymbolTags::Border => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BORDER,
-        SymbolTags::Diagonal => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DIAGONAL,
-        SymbolTags::Dot => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DOT,
-        SymbolTags::Quad => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_QUAD,
-        SymbolTags::Hhalf => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_HHALF,
-        SymbolTags::Vhalf => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_VHALF,
-        SymbolTags::Half => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_HALF,
-        SymbolTags::Inverted => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_INVERTED,
-        SymbolTags::Braille => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BRAILLE,
-        SymbolTags::Technical => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_TECHNICAL,
-        SymbolTags::Geometric => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_GEOMETRIC,
-        SymbolTags::ASCII => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ASCII,
-        SymbolTags::Alpha => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALPHA,
-        SymbolTags::Digit => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DIGIT,
-        SymbolTags::AlNum => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALNUM,
-        SymbolTags::Narrow => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_NARROW,
-        SymbolTags::Wide => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_WIDE,
-        SymbolTags::Ambiguous => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_AMBIGUOUS,
-        SymbolTags::Ugly => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_UGLY,
-        SymbolTags::Legacy => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_LEGACY,
-        SymbolTags::Sextant => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SEXTANT,
-        SymbolTags::Wedge => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_WEDGE,
-        SymbolTags::Latin => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_LATIN,
-        SymbolTags::Imported => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_IMPORTED,
-        SymbolTags::Octant => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_OCTANT,
-        SymbolTags::Extra => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_EXTRA,
-        SymbolTags::Bad => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BAD,
-        SymbolTags::All => ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALL,
+bitflags::bitflags! {
+    #[repr(transparent)]
+    pub struct SymbolTags: i32 {
+        /// Special value meaning no symbols.
+        const None = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_NONE;
+        /// Space.
+        const Space = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SPACE;
+        /// Solid (inverse of space).
+        const Solid = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SOLID;
+        /// Stipple symbols.
+        const Stipple = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_STIPPLE;
+        /// Block symbols.
+        const Block = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BLOCK;
+        /// Border symbols.
+        const Border = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BORDER;
+        /// Diagonal border symbols.
+        const Diagonal = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DIAGONAL;
+        /// Symbols that look like isolated dots (excluding Braille).
+        const Dot = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DOT;
+        /// Quadrant block symbols.
+        const Quad = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_QUAD;
+        /// Horizontal half block symbols.
+        const Hhalf = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_HHALF;
+        /// Vertical half block symbols.
+        const Vhalf = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_VHALF;
+        /// Joint set of horizontal and vertical halves.
+        const Half = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_HALF;
+        /// Symbols that are the inverse of simpler symbols. When two symbols complement each other, only one will have this tag.
+        const Inverted = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_INVERTED;
+        /// Braille symbols.
+        const Braille = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BRAILLE;
+        /// Miscellaneous technical symbols.
+        const Technical = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_TECHNICAL;
+        /// Geometric shapes
+        const Geometric = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_GEOMETRIC;
+        /// Printable ASCII characters.
+        const ASCII = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ASCII;
+        /// Letters.
+        const Alpha = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALPHA;
+        /// Digits.
+        const Digit = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_DIGIT;
+        /// Joint set of letters and digits.
+        const AlNum = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALNUM;
+        /// Characters that are one cell wide.
+        const Narrow = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_NARROW;
+        /// Characters that are two cells wide.
+        const Wide = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_WIDE;
+        /// Characters of uncertain width. Always excluded unless specifically asked for.
+        const Ambiguous = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_AMBIGUOUS;
+        /// Characters that are generally undesired or unlikely to render well. Always excluded unless specifically asked for.
+        const Ugly = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_UGLY;
+        /// Legacy computer symbols, including sextants, wedges and more.
+        const Legacy = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_LEGACY;
+        /// Sextant 2x3 mosaics.
+        const Sextant = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_SEXTANT;
+        /// Wedge shapes that align with sextants.
+        const Wedge = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_WEDGE;
+        /// Latin and Latin-like symbols (superset of ASCII).
+        const Latin = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_LATIN;
+        /// Symbols for which glyphs were imported with chafa_symbol_map_add_glyph().
+        const Imported = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_IMPORTED;
+        /// Octant 2x4 mosaics.
+        const Octant = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_OCTANT;
+        /// Symbols not in any other category.
+        const Extra = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_EXTRA;
+        /// Joint set of ugly and ambiguous characters. Always excluded unless specifically asked for.
+        const Bad = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_BAD;
+        /// Special value meaning all supported symbols.
+        const All = ffi::ChafaSymbolTags_CHAFA_SYMBOL_TAG_ALL;
     }
 }

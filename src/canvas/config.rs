@@ -313,19 +313,21 @@ pub enum DitherMode {
     Max = ffi::ChafaDitherMode_CHAFA_DITHER_MODE_MAX,
 }
 
-#[repr(u32)]
-pub enum Optimizations {
-    /// Suppress redundant SGR control sequences.
-    ReuseAttributes = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_REUSE_ATTRIBUTES,
-    /// Reserved for future use.
-    SkipCells = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_SKIP_CELLS,
-    /// Use REP sequence to compress repeated runs of similar cells.
-    RepeatCells = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_REPEAT_CELLS,
+bitflags::bitflags! {
+    #[repr(transparent)]
+    pub struct Optimizations: u32 {
+        /// Suppress redundant SGR control sequences.
+        const ReuseAttributes = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_REUSE_ATTRIBUTES;
+        /// Reserved for future use.
+        const SkipCells = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_SKIP_CELLS;
+        /// Use REP sequence to compress repeated runs of similar cells.
+        const RepeatCells = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_REPEAT_CELLS;
 
-    /// All optimizations disabled.
-    None = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_NONE,
-    /// All optimizations enabled.
-    All = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_ALL,
+        /// All optimizations disabled.
+        const None = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_NONE;
+        /// All optimizations enabled.
+        const All = ffi::ChafaOptimizations_CHAFA_OPTIMIZATION_ALL;
+    }
 }
 
 #[repr(u32)]
