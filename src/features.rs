@@ -40,6 +40,9 @@ pub fn describe_features(features: Features) -> Result<String, &'static str> {
             let str = std::ffi::CStr::from_ptr((*str_p) as *const std::os::raw::c_char)
                 .to_string_lossy()
                 .into_owned();
+
+            ffi::g_free(str_p as *mut std::os::raw::c_void);
+
             return Ok(str);
         }
     };

@@ -3,6 +3,7 @@
  */
 
 use crate::canvas::Config;
+use crate::misc;
 use crate::{ffi, placement::Placement, term::info::TermInfo};
 use std::{ffi::CStr, fmt::write};
 
@@ -61,7 +62,7 @@ impl Canvas {
     pub fn set_pixels(
         &self,
         pixels: &[u8],
-        pixel_type: ffi::ChafaPixelType,
+        pixel_type: misc::PixelType,
         src_width: i32,
         src_height: i32,
         src_rowstride: i32,
@@ -69,7 +70,7 @@ impl Canvas {
         unsafe {
             ffi::chafa_canvas_draw_all_pixels(
                 self.raw,
-                pixel_type,
+                pixel_type as u32,
                 pixels.as_ptr(),
                 src_width,
                 src_height,
