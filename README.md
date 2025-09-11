@@ -4,6 +4,7 @@ The bindings are generated at build time using [bindgen](https://docs.rs/bindgen
 
 # System dependencies:
 - [Chafa/libchafa](https://hpjansson.org/chafa/);
+- [glib2](https://docs.gtk.org/glib/);
 - [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/);
 - [Clang](https://rust-lang.github.io/rust-bindgen/requirements.html)
 
