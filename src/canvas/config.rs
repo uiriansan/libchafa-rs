@@ -39,11 +39,11 @@ impl Config {
 
     /// Returns a tuple containing config's width and height in character cells.
     pub fn get_geometry(&self) -> (i32, i32) {
-        let width: i32 = -1;
-        let height: i32 = -1;
+        let mut width: i32 = 0;
+        let mut height: i32 = 0;
 
         unsafe {
-            ffi::chafa_canvas_config_get_geometry(self.raw, width as *mut _, height as *mut _);
+            ffi::chafa_canvas_config_get_geometry(self.raw, &mut width, &mut height);
         }
         (width, height)
     }
@@ -57,11 +57,11 @@ impl Config {
 
     /// Returns a tuple containing config's cell width and height in pixels.
     pub fn get_cell_geometry(&self) -> (i32, i32) {
-        let width: i32 = -1;
-        let height: i32 = -1;
+        let mut width: i32 = 0;
+        let mut height: i32 = 0;
 
         unsafe {
-            ffi::chafa_canvas_config_get_cell_geometry(self.raw, width as *mut _, height as *mut _);
+            ffi::chafa_canvas_config_get_cell_geometry(self.raw, &mut width, &mut height);
         }
         (width, height)
     }

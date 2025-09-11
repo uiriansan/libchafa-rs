@@ -180,11 +180,11 @@ impl Canvas {
     /// # Returns:
     /// A tuple containing the foreground and the background color, respectively.
     pub fn get_colors_at(&self, x: i32, y: i32) -> (i32, i32) {
-        let fg: i32 = -1;
-        let bg: i32 = -1;
+        let mut fg: i32 = -1;
+        let mut bg: i32 = -1;
 
         unsafe {
-            ffi::chafa_canvas_get_colors_at(self.raw, x, y, fg as *mut _, bg as *mut _);
+            ffi::chafa_canvas_get_colors_at(self.raw, x, y, &mut fg, &mut bg);
         }
         (fg, bg)
     }
@@ -211,11 +211,11 @@ impl Canvas {
     /// # Returns:
     /// A tuple containing the foreground and the background color, respectively.
     pub fn get_raw_colors_at(&self, x: i32, y: i32) -> (i32, i32) {
-        let fg: i32 = -1;
-        let bg: i32 = -1;
+        let mut fg: i32 = -1;
+        let mut bg: i32 = -1;
 
         unsafe {
-            ffi::chafa_canvas_get_raw_colors_at(self.raw, x, y, fg as *mut _, bg as *mut _);
+            ffi::chafa_canvas_get_raw_colors_at(self.raw, x, y, &mut fg, &mut bg);
         }
         (fg, bg)
     }
@@ -254,44 +254,4 @@ impl Drop for Canvas {
             }
         }
     }
-}
-
-/// Calculates an optimal geometry for a ChafaCanvas given the width and height of an input image, maximum width and height of the canvas, font ratio, zoom and stretch preferences.
-///
-/// src_width and src_height must both be zero or greater.
-///
-/// dest_width_inout and dest_height_inout must point to integers containing the maximum dimensions of the canvas in character cells.
-/// These will be replaced by the calculated values, which may be zero if one of the input dimensions is zero. If one or both of the input parameters is negative, they will be treated as unspecified and calculated based on the remaining parameters and aspect ratio.
-///
-/// font_ratio is the font's width divided by its height. 0.5 is a typical value.
-/// # Parameters:
-/// --- `src_width`: Width of source;
-/// --- `src_height`: Height of source;
-/// --- `font_ratio`: Target font's width to height ratio;
-/// --- `zoom`: TRUE to upscale image to fit maximum dimensions, FALSE otherwise;
-/// --- `stretch`: TRUE to ignore aspect of source, FALSE otherwise;
-/// # Returns:
-/// A tuple containing the optimal width and height for the canvas, respectively.
-pub fn calc_optimal_canvas_geometry(
-    src_width: i32,
-    src_height: i32,
-    font_ratio: f32,
-    zoom: bool,
-    stretch: bool,
-) -> (i32, i32) {
-    let width: i32 = -1;
-    let height: i32 = -1;
-
-    unsafe {
-        ffi::chafa_calc_canvas_geometry(
-            src_width,
-            src_height,
-            width as *mut _,
-            height as *mut _,
-            font_ratio,
-            if zoom { 1 } else { 0 },
-            if stretch { 1 } else { 0 },
-        );
-    }
-    (width, height)
 }

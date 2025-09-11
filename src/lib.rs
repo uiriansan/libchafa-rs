@@ -12,6 +12,9 @@ pub use frame::*;
 mod image;
 pub use image::*;
 
+mod misc;
+pub use misc::*;
+
 mod placement;
 pub use placement::*;
 
