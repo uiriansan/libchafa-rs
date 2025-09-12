@@ -4,6 +4,7 @@
 
 use crate::ffi;
 
+/// A ChafaPlacement describes how an image is placed on a ChafaCanvas. It contains information about the image, its alignment and tucking policy.
 pub struct Placement {
     pub raw: *mut ffi::ChafaPlacement,
 }

@@ -4,7 +4,7 @@
 
 use crate::canvas::Config;
 use crate::misc;
-use crate::{ffi, placement::Placement, term::info::TermInfo};
+use crate::{ffi, placement::Placement, term::Info};
 use std::{ffi::CStr, fmt::write};
 
 /// A ChafaCanvas is a canvas that can render its contents as text strings.
@@ -85,7 +85,7 @@ impl Canvas {
     /// All output lines except for the last one will end in a newline.
     /// # Parameters:
     /// --- `term_info`: Terminal to format for, or `None` for fallback
-    pub fn create_string(&self, term_info: Option<TermInfo>) -> Result<String, &'static str> {
+    pub fn create_string(&self, term_info: Option<Info>) -> Result<String, &'static str> {
         let mut term: *mut ffi::ChafaTermInfo = std::ptr::null_mut();
 
         if let Some(ti) = term_info {
@@ -112,10 +112,7 @@ impl Canvas {
     /// They must be printed in sequence, exactly as they appear.
     /// # Parameters:
     /// --- `term_info`: Terminal to format for, or `None` for fallback
-    pub fn create_string_rows(
-        &self,
-        term_info: Option<TermInfo>,
-    ) -> Result<Vec<String>, &'static str> {
+    pub fn create_string_rows(&self, term_info: Option<Info>) -> Result<Vec<String>, &'static str> {
         let mut term: *mut ffi::ChafaTermInfo = std::ptr::null_mut();
 
         if let Some(ti) = term_info {

@@ -4,6 +4,9 @@
 
 use crate::ffi;
 
+/// A ChafaImage represents a raster image for placement on a ChafaCanvas. It can currently hold a single ChafaFrame.
+///
+/// To place an image on a canvas, it must first be assigned to a ChafaPlacement.
 pub struct Image {
     pub raw: *mut ffi::ChafaImage,
 }
