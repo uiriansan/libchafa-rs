@@ -69,7 +69,12 @@ impl Info {
     /// Assigns a new name to term_info . The name should be a short lowercase ASCII string that uniquely identifies the terminal or program described by term_info.
     pub fn set_name(&self, name: &str) {
         unsafe {
-            ffi::chafa_term_info_set_name(self.raw, name.as_ptr() as *const i8);
+            ffi::chafa_term_info_set_name(
+                self.raw,
+                std::ffi::CString::new(name)
+                    .expect("Chafa -> Failed to create CString")
+                    .as_ptr() as *const i8,
+            );
         }
     }
 
@@ -100,9 +105,96 @@ impl Info {
     }
 
     /// Gets the string equivalent of seq stored in term_info .
-    pub fn get_seq(&self, seq: Seq) {
-        ()
+    pub fn get_seq(&self, seq: Seq) -> Option<String> {
+        unsafe {
+            let seq_str = ffi::chafa_term_info_get_seq(self.raw, seq as u32);
+
+            if seq_str.is_null() {
+                None
+            } else {
+                let s = std::ffi::CStr::from_ptr(seq_str as *const std::os::raw::c_char)
+                    .to_string_lossy()
+                    .into_owned();
+                ffi::g_free(seq_str as *mut _);
+                Some(s)
+            }
+        }
     }
+
+    /// Sets the control sequence string equivalent of seq stored in term_info to str .
+    ///
+    /// The string may contain argument indexes to be substituted with integers on formatting. The indexes are preceded by a percentage character and start at 1, i.e. %1, %2, %3, etc.
+    ///
+    /// The string's length after formatting must not exceed CHAFA_TERM_SEQ_LENGTH_MAX bytes. Each argument can add up to four digits, or three for those specified as 8-bit integers. If the string could potentially exceed this length when formatted, chafa_term_info_set_seq() will return FALSE.
+    ///
+    /// If parsing fails or str is too long, any previously existing sequence will be left untouched.
+    ///
+    /// Passing NULL for str clears the corresponding control sequence.
+    /// # Parameters:
+    /// --- `seq_str`: A control sequence string, or None to clear;
+    pub fn set_seq(&self, seq: Seq, seq_str: Option<&str>) -> Result<(), String> {
+        let mut seq_str_ptr: *mut std::os::raw::c_char = std::ptr::null_mut();
+        let c_str: std::ffi::CString;
+        if let Some(s) = seq_str {
+            c_str = std::ffi::CString::new(s).expect("Chafa -> Failed to create CString");
+            seq_str_ptr = c_str.as_ptr() as *mut _;
+        }
+        let mut error: *mut ffi::GError = std::ptr::null_mut();
+
+        unsafe {
+            ffi::chafa_term_info_set_seq(self.raw, seq as u32, seq_str_ptr, &mut error);
+
+            if !error.is_null() {
+                let msg = std::ffi::CStr::from_ptr((*error).message as *const std::os::raw::c_char)
+                    .to_string_lossy()
+                    .into_owned();
+                let err_msg = format!("Chafa -> Failed to apply selectors: {}", &msg);
+
+                ffi::g_error_free(error);
+                return Err(err_msg);
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Checks if term_info can emit seq.
+    pub fn have_seq(&self, seq: Seq) -> bool {
+        if unsafe { ffi::chafa_term_info_have_seq(self.raw, seq as u32) } == 0 {
+            false
+        } else {
+            true
+        }
+    }
+
+    /// Gets whether seq can be inherited from the outer ChafaTermInfo when chaining with chafa_term_info_chain().
+    pub fn get_inherit_seq(&self, seq: Seq) -> bool {
+        if unsafe { ffi::chafa_term_info_get_inherit_seq(self.raw, seq as u32) } == 0 {
+            false
+        } else {
+            true
+        }
+    }
+
+    /// Sets whether seq can be inherited from the outer ChafaTermInfo when chaining with chafa_term_info_chain().
+    pub fn set_inherit_seq(&self, seq: Seq, inherit: bool) {
+        unsafe {
+            ffi::chafa_term_info_set_inherit_seq(self.raw, seq as u32, if inherit { 1 } else { 0 });
+        }
+    }
+
+    // TODO: I honestly have no idea how to implement these easily.
+    // pub fn emit_seq(&self) {}
+    // pub fn emit_seq_valist(&self) {}
+
+    /// Attempts to parse a terminal sequence from an input data array. If successful, CHAFA_PARSE_SUCCESS will be returned, the input pointer will be advanced and the parsed length will be subtracted from input_len .
+    ///
+    /// Any numeric parsed arguments are returned as an array starting at args_out , which must have room for up to CHAFA_TERM_SEQ_ARGS_MAX elements.
+    ///
+    /// The number of parsed arguments is returned in n_args_out . This is useful for seqs with a variable number of arguments, like CHAFA_TERM_SEQ_PRIMARY_DEVICE_ATTRIBUTES.
+    ///
+    /// Either or both of args_out and n_args_out can be NULL, in which case nothing is returned for that parameter.
+    pub fn parse_seq_varargs(&self, seq: Seq) {}
 }
 
 impl Drop for Info {
@@ -122,6 +214,35 @@ bitflags::bitflags! {
     #[repr(transparent)]
     pub struct Quirks: u32 {
         const SixelOvershoot = ffi::ChafaTermQuirks_CHAFA_TERM_QUIRK_SIXEL_OVERSHOOT;
+    }
+}
+
+#[repr(u32)]
+/// An enumeration of the possible return values from the parsing function.
+pub enum ParseResult {
+    Success = ffi::ChafaParseResult_CHAFA_PARSE_SUCCESS,
+    /// Data mismatch
+    Failure = ffi::ChafaParseResult_CHAFA_PARSE_FAILURE,
+    /// Partial success, but not enough input
+    Again = ffi::ChafaParseResult_CHAFA_PARSE_AGAIN,
+}
+impl From<u32> for ParseResult {
+    fn from(value: u32) -> Self {
+        match value {
+            ffi::ChafaParseResult_CHAFA_PARSE_SUCCESS => ParseResult::Success,
+            ffi::ChafaParseResult_CHAFA_PARSE_FAILURE => ParseResult::Failure,
+            ffi::ChafaParseResult_CHAFA_PARSE_AGAIN => ParseResult::Again,
+            _ => ParseResult::Success,
+        }
+    }
+}
+impl From<ParseResult> for u32 {
+    fn from(value: ParseResult) -> Self {
+        match value {
+            ParseResult::Success => ffi::ChafaParseResult_CHAFA_PARSE_SUCCESS,
+            ParseResult::Failure => ffi::ChafaParseResult_CHAFA_PARSE_FAILURE,
+            ParseResult::Again => ffi::ChafaParseResult_CHAFA_PARSE_AGAIN,
+        }
     }
 }
 

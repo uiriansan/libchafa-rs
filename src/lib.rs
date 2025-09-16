@@ -1,7 +1,6 @@
 #![allow(unused_imports)]
-pub mod ffi;
-
 pub mod canvas;
+pub mod term;
 
 pub mod features;
 pub use features::Features;
@@ -21,4 +20,7 @@ pub use placement::*;
 mod symbol_map;
 pub use symbol_map::*;
 
-pub mod term;
+#[cfg(not(feature = "ffi"))]
+mod ffi;
+#[cfg(feature = "ffi")]
+pub mod ffi;

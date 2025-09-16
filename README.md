@@ -1,4 +1,4 @@
-Wrapper for [libchafa](https://hpjansson.org/chafa/development/). Part of [term3dv](https://github.com/uiriansan/term3dv).
+Wrapper for [chafa](https://hpjansson.org/chafa/development/) bindings. Part of [term3dv](https://github.com/uiriansan/term3dv).
 
 The bindings are generated at build time using [bindgen](https://docs.rs/bindgen/latest/bindgen/).
 

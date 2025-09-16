@@ -24,7 +24,8 @@ fn main() {
         .expect("bindgen: Failed to write bindings.");
 
     // Generate values for `ChafaTermSeq` enum:
-    // TODO: Come up with a solution for the slow build times.
+    // TODO: Come up with a better solution that's not slow to build
+    // and doesn't mess up with the LSP.
 
     let mut term_seq_variants = String::new();
 

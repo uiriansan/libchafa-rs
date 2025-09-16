@@ -10,3 +10,6 @@ pkg-config = "0.3.32"
 
 [dependencies]
 bitflags = "2.9.4"
+
+[features]
+ffi = []

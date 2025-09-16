@@ -70,7 +70,9 @@ impl SymbolMap {
             let mut error: *mut ffi::GError = std::ptr::null_mut();
             ffi::chafa_symbol_map_apply_selectors(
                 self.raw,
-                selectors.as_ptr() as *const i8,
+                std::ffi::CString::new(selectors)
+                    .expect("Chafa -> Failed to create CString")
+                    .as_ptr(),
                 &mut error,
             );
             if !error.is_null() {
